@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Title</title>
+</head>
+<body>
+<canvas id="myCanvas" width="800" height="600" style="background:#eee"></canvas>
+<script type="text/javascript">
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  var dragging = false;
+  var startX = 200;
+  var startY = 200;
+  var ball = {x:startX,y:startY,r:20,c:"green"};
+  var ballShadow;
+  canvas.onmousedown=mouseDown;
+  canvas.onmousemove=mouseMove;
+  canvas.onmouseup=mouseUp;
+  resetBall();
+  loop();
+
+  function drawAngles() {
+    var a = (Math.atan2(ball.y-ballShadow.y,ballShadow.x-ball.x)+Math.PI*2)%(Math.PI*2);
+    var d = Math.sqrt(Math.pow(ballShadow.x-ball.x,2)+Math.pow(ball.y-ballShadow.y,2));
+    ctx.beginPath();
+    //ctx.strokeStyle = "black";
+    ctx.strokeText("Angle: "+(Math.round(1000*180*a/Math.PI)/1000)+" °",ball.x+(d/2)+5,ball.y-15);
+    ctx.moveTo(ballShadow.x,ballShadow.y);
+    ctx.lineTo(ball.x,ball.y);
+    ctx.lineTo(ball.x+d,ball.y);
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(ball.x,ball.y,d/2,0,-a,true);
+    ctx.stroke();
+    ctx.closePath();
+  }
+  
+  function drawBall(b) {
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,b.r,0,Math.PI*2,false);
+    ctx.fillStyle=b.c;
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function loop() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(dragging) {
+      drawBall(ballShadow);
+      drawBall(ball);
+      drawAngles();
+    }
+    else {
+      drawBall(ball);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function mouseDown(e) {
+    if(e.pageX>=ball.x-ball.r&&e.pageX<=ball.x+ball.r&&e.pageY>=ball.y-ball.r&&e.pageY<=ball.y+ball.r) {
+      ballShadow = JSON.parse(JSON.stringify(ball));
+      ballShadow.c = "rgba(0,255,0,0.5)";
+      dragging=true;
+    }
+  }
+
+  function mouseMove(e) {
+    if(dragging) {
+      ball.x = e.pageX;
+      ball.y = e.pageY;
+    }
+  }
+
+  function mouseUp(e) {
+    if(dragging) {
+      dragging = false;
+      resetBall();
+    }
+  }
+
+  function resetBall() {
+    ball.x = startX;
+    ball.y = startY;
+  }
+</script>
+</body>
+</html>

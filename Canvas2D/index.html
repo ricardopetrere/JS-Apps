@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<canvas id="myCanvas" width="480px" height="840px" style="background:#eee"></canvas>
+<script type="text/javascript">
+	var canvas = document.getElementById("myCanvas");
+	var ctx = canvas.getContext("2d");
+	canvas.onmouseup = releaseBall;
+	canvas.onmousedown = captureBall;
+
+	var xBall;
+	var yBall;
+	var rBall=25;
+	var rTarget = 50;
+	var drTarget = 1;
+
+	resetBall();
+	loop();
+
+	function changeTargetSize() {
+		if (rTarget==10||rTarget==50) {
+			drTarget = -drTarget;
+		}
+		rTarget += drTarget;
+	}
+
+	function dragBall(e) {
+		xBall=e.pageX;
+		yBall=e.pageY;
+	}
+	
+	function captureBall(e) {
+		if(e.pageX>=xBall-rBall&&e.pageX<=xBall+rBall&&e.pageY>=yBall-rBall&&e.pageY<=yBall+rBall) {
+			xBall=e.pageX;
+			yBall=e.pageY;
+			canvas.onmousemove = dragBall;
+		}
+	}
+
+	function drawBall() {
+		ctx.beginPath();
+		ctx.arc(xBall,yBall,rBall,0,Math.PI*2,false);
+		ctx.fillStyle = "red";
+		ctx.fill();
+		ctx.closePath();
+	}
+
+	function drawTarget() {
+		ctx.beginPath();
+		ctx.arc(canvas.width/2,200,rTarget,0,Math.PI*2,false);
+		ctx.strokeStyle = "green";
+		ctx.stroke();
+		ctx.closePath();
+	}
+
+	function loop() {
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		changeTargetSize();
+		drawBall();
+		drawTarget();
+
+		requestAnimationFrame(loop);
+	}
+
+	function releaseBall(e) {
+		canvas.onmousemove = null;
+	}
+
+	function resetBall() {
+		xBall = canvas.width/2;
+		yBall = canvas.height-200;
+	}
+</script>
+</body>
+</html>
